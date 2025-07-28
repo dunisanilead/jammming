@@ -1,7 +1,7 @@
 import React from 'react';
 import Tracklist from './Tracklist';
 
-function Playlist({name, tracks,onRemove, onChangeName, onSave}) {
+function Playlist({name, tracks,onRemove, onChangeName, onSave, isSaving,saveMessage}) {
   return (
     <div className="Playlist">
      <div>
@@ -20,6 +20,8 @@ function Playlist({name, tracks,onRemove, onChangeName, onSave}) {
         Save To Spotify
       </button>
     </div>
+    {isSaving && <p>Saving...</p>}
+    {saveMessage && <p>{saveMessage}</p>}
       
     </div>
   );

@@ -9,18 +9,29 @@ import Spotify from './util/Spotify';
 function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [playlistName, setPlaylistName] = useState("Summer Vibes");
-  const [playlistTracks, setPlaylistTracks] = useState([
-     {
-        id: 99,
-        name: 'Test Song',
-        artist: 'Test Artist'
-     }
-  ]);
+  const [playlistTracks, setPlaylistTracks] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
 
-  const savePlaylist = () => {
-    const trackUris = playlistTracks.map(track => track.uri);
-    console.log("Saving playlist with URIs:", trackUris);
+  const savePlaylist = async () => {
+  const trackUris = playlistTracks.map(track => track.uri);
 
+  if (!trackUris.length || !playlistName) return;
+
+  setIsSaving(true);
+  setSaveMessage('');
+
+  try {
+    await Spotify.savePlaylist(playlistName, trackUris);
+    setSaveMessage('Playlist saved to Spotify!');
+    setPlaylistTracks([]);
+    setPlaylistName('New Playlist');
+  } catch (error) {
+    setSaveMessage('Error saving playlist.');
+    console.error(error);
+  } finally {
+    setIsSaving(false);
+  }
     // Reset
     setPlaylistTracks([]);
     setPlaylistName("New Playlist");
@@ -65,6 +76,8 @@ function App() {
             tracks={playlistTracks}
             onRemove={removeTrackFromPlaylist}
             onSave={savePlaylist}
+            isSaving={isSaving}
+            saveMessage={saveMessage}
           />
         </div>
       </div>

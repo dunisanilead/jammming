@@ -83,13 +83,7 @@ const Spotify = {
 
       window.location = authUrl;
     });
-  },
-
-  // Placeholder for saving a playlist (to be implemented later)
-  savePlaylist() {
-    const token = Spotify.getAccessToken();
-    console.log("Using token to save playlist:", token);
-    // Implementation for saving the playlist will go here
+  
   },
 
   async search(term) {
@@ -128,6 +122,56 @@ const Spotify = {
       return [];
     }
     
+  },
+
+
+  async savePlaylist(name, trackUris) {
+    const token = await Spotify.getAccessToken();
+    if (!token) {
+      console.log('Access Token is missing.');
+      return;
+    }
+
+    try {
+      // 1. Get user ID
+      const response = await fetch('https://api.spotify.com/v1/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const userData = await response.json();
+      const userId = userData.id;
+
+      // 2. Create new playlist
+      const newPlaylist = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: name,
+          description: "Created with Jammming",
+          public: true
+        })
+      });
+      const playlistData = await newPlaylist.json();
+      const playlistId = playlistData.id;
+
+      // 3. Add tracks
+      await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uris: trackUris
+        })
+      });
+    } catch (error) {
+      console.error('Error saving playlist:', error);
+    }
   }
   
 };
