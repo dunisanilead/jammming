@@ -1,6 +1,6 @@
 import Track from './Track';
 
-function Tracklist({ tracks }) {
+function Tracklist({ tracks, onAdd, onRemove}) {
   if (!tracks || tracks.length === 0) {
     return <div className="tracklist">No tracks available.</div>;
   }
@@ -8,7 +8,11 @@ function Tracklist({ tracks }) {
   return (
     <div className="tracklist">
       {tracks.map((track) => (
-        <Track key={track.id} track={track} />
+        <Track 
+        key={track.id} 
+        track={track} 
+        onAdd={onAdd} 
+        onRemove={onRemove}/>
       ))}
     </div>
   );
